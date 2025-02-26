@@ -1,0 +1,153 @@
+/* Custom CSS for Directory Snapshot Tool */
+
+/* Beta badge styling */
+.beta-badge {
+  background: linear-gradient(45deg, #4b6eff, #ff4b4b);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+/* Tab styling */
+.tab-btn {
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.dark .tab-btn.active {
+  background-color: #2563eb;
+}
+
+/* Tree view styling */
+.tree-item {
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.tree-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .tree-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Sidebar resize handle */
+#sidebar-resize-handle {
+  width: 4px;
+  cursor: ew-resize;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.dark #sidebar-resize-handle {
+  background-color: #4b5563;
+}
+
+#sidebar-resize-handle:hover {
+  background-color: #3b82f6;
+}
+
+.dark #sidebar-resize-handle:hover {
+  background-color: #2563eb;
+}
+
+/* Cursor styles for resizing */
+html.cursor-ew-resize,
+html.cursor-ew-resize * {
+  cursor: ew-resize !important;
+}
+
+/* Sidebar styling */
+#sidebar {
+  position: relative;
+  transition: width 0.2s ease;
+  min-width: 200px;
+  max-width: 500px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.dark #sidebar {
+  border-right-color: #4b5563;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Animation for loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Tree indent styling */
+.tree-indent {
+  min-width: 16px;
+  height: 1px;
+}
+
+/* Code block styling */
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Button styling */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Transition for all elements */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}

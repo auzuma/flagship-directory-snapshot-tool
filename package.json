@@ -1,0 +1,36 @@
+{
+  "name": "directory-snapshot-tool",
+  "version": "1.0.0",
+  "description": "Desktop application for creating and recreating directory snapshots",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "tiktoken": "^1.0.10"
+  },
+  "build": {
+    "appId": "com.directory-snapshot-tool",
+    "productName": "Directory Snapshot Tool",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}

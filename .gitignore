@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Electron specific
+dist/
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.DS_Store
