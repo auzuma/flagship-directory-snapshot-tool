@@ -15,15 +15,18 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      sandbox: false, // Disable sandbox to allow Node.js modules in preload
+      worldSafeExecuteJavaScript: true, // Ensure safe JavaScript execution
+      enableRemoteModule: false // Keep remote module disabled for security
     },
     icon: path.join(__dirname, 'assets/icon.png')
   });
 
   mainWindow.loadFile('index.html');
   
-  // Open DevTools in development
-  // mainWindow.webContents.openDevTools();
+  // Enable DevTools for debugging
+  mainWindow.webContents.openDevTools();
   
   mainWindow.on('closed', function () {
     mainWindow = null;
@@ -53,12 +56,21 @@ ipcMain.handle('select-directory', async () => {
 });
 
 ipcMain.handle('get-directory-structure', (event, dirPath) => {
+  console.log(`Received request to get directory structure for: ${dirPath}`);
+  
+  if (!dirPath) {
+    console.error('No directory path provided');
+    return { error: 'No directory path provided' };
+  }
+  
   try {
+    console.log(`Getting directory structure for: ${dirPath}`);
     const structure = getDirectoryStructure(dirPath);
+    console.log(`Successfully got directory structure with ${structure.length} items`);
     return structure;
   } catch (error) {
     console.error('Error getting directory structure:', error);
-    return { error: error.message };
+    return { error: error.message || 'Unknown error' };
   }
 });
 

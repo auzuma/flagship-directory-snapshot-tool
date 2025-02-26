@@ -1,28 +1,58 @@
-// Token counter using tiktoken for Electron
-const tiktoken = require('tiktoken');
+// Token counter module using tiktoken
+let tiktoken;
 
+try {
+  // Attempt to require tiktoken dynamically
+  tiktoken = require('tiktoken');
+  console.log('Successfully loaded tiktoken module');
+} catch (error) {
+  console.error('Failed to load tiktoken:', error.message);
+  console.log('Using fallback token counter...');
+  // Continue without tiktoken, we'll use the fallback below
+}
+
+/**
+ * Counts tokens in a text string using tiktoken's cl100k_base encoding
+ * @param {string} text - The text to count tokens in
+ * @returns {number} - The token count
+ */
 function countTokens(text) {
   if (!text) return 0;
   
   try {
-    // Try to get the cl100k_base encoding (used by GPT-3.5/4 models)
-    const encoding = tiktoken.get_encoding("cl100k_base");
-    
-    // Count the tokens
-    const tokenCount = encoding.encode(text).length;
-    
-    return tokenCount;
+    if (tiktoken) {
+      // Use tiktoken if available
+      const encoding = tiktoken.get_encoding("cl100k_base");
+      const tokens = encoding.encode(text);
+      const count = tokens.length;
+      encoding.free();
+      return count;
+    } else {
+      // Fallback token counter if tiktoken isn't available
+      return fallbackCountTokens(text);
+    }
   } catch (error) {
-    console.error('Error counting tokens:', error);
-    
-    // Fallback to a simple approximation if tiktoken fails
-    const tokens = text.split(/[\s,.!?;:()\[\]{}'"<>\/\\|=+\-*&^%$#@~`]+/)
-      .filter(token => token.length > 0);
-    
-    const newlines = (text.match(/\n/g) || []).length;
-    
-    return tokens.length + newlines;
+    console.error('Error counting tokens:', error.message);
+    return fallbackCountTokens(text);
   }
 }
 
-module.exports = { countTokens };
+/**
+ * A simple fallback token counter that approximates tokens
+ * This is less accurate than tiktoken but works without dependencies
+ * @param {string} text - The text to count tokens in
+ * @returns {number} - The approximate token count
+ */
+function fallbackCountTokens(text) {
+  // Simple approximation - count words and add newlines
+  const tokens = text.split(/[\s,.!?;:()\[\]{}'"<>\/\\|=+\-*&^%$#@~`]+/)
+    .filter(token => token.length > 0);
+  
+  const newlines = (text.match(/\n/g) || []).length;
+  
+  return tokens.length + newlines;
+}
+
+module.exports = {
+  countTokens
+};

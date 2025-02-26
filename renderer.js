@@ -1,38 +1,38 @@
 // Renderer process
 // const { ipcRenderer } = require('electron');
 
-// DOM Elements
-const folderPathInput = document.getElementById('folder-path');
-const browseBtn = document.getElementById('browse-btn');
-const directoryTree = document.getElementById('directory-tree');
-const refreshTreeBtn = document.getElementById('refresh-tree-btn');
-const clearSelectionsBtn = document.getElementById('clear-selections-btn');
-const sortFilesCheckbox = document.getElementById('sort-files');
-const manualIgnoreTextarea = document.getElementById('manual-ignore');
-const sideTextTextarea = document.getElementById('side-text');
-const generateSnapshotBtn = document.getElementById('generate-snapshot-btn');
-const snapshotResult = document.getElementById('snapshot-result');
-const tokenCount = document.getElementById('token-count');
-const snapshotContent = document.getElementById('snapshot-content');
-const copySnapshotBtn = document.getElementById('copy-snapshot-btn');
-const themeToggle = document.getElementById('theme-toggle');
-const darkIcon = document.getElementById('dark-icon');
-const lightIcon = document.getElementById('light-icon');
-const sidebarResizeHandle = document.getElementById('sidebar-resize-handle');
-const sidebar = document.getElementById('sidebar');
+// DOM Elements - will be initialized in the DOMContentLoaded event
+let folderPathInput;
+let browseBtn;
+let directoryTree;
+let refreshTreeBtn;
+let clearSelectionsBtn;
+let sortFilesCheckbox;
+let manualIgnoreTextarea;
+let sideTextTextarea;
+let generateSnapshotBtn;
+let snapshotResult;
+let tokenCount;
+let snapshotContent;
+let copySnapshotBtn;
+let themeToggle;
+let darkIcon;
+let lightIcon;
+let sidebarResizeHandle;
+let sidebar;
 
 // Tab elements
-const snapshotTabBtn = document.getElementById('snapshot-tab-btn');
-const recreateTabBtn = document.getElementById('recreate-tab-btn');
-const snapshotTab = document.getElementById('snapshot-tab');
-const recreateTab = document.getElementById('recreate-tab');
+let snapshotTabBtn;
+let recreateTabBtn;
+let snapshotTab;
+let recreateTab;
 
 // Recreate tab elements
-const outputDirPathInput = document.getElementById('output-dir-path');
-const browseOutputBtn = document.getElementById('browse-output-btn');
-const snapshotInput = document.getElementById('snapshot-input');
-const recreateDirectoryBtn = document.getElementById('recreate-directory-btn');
-const recreateResult = document.getElementById('recreate-result');
+let outputDirPathInput;
+let browseOutputBtn;
+let snapshotInput;
+let recreateDirectoryBtn;
+let recreateResult;
 
 // Global variables
 let directoryStructure = {};
@@ -41,22 +41,71 @@ let checkedItems = new Set();
 let uncheckedItems = new Set();
 let defaultIgnoredItems = ['.git', 'node_modules', '__pycache__', 'venv', 'dist', 'build'];
 
-// Initialize the application
+// Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Check for saved theme preference
-  const darkMode = localStorage.getItem('darkMode') === 'true';
-  if (darkMode) {
-    document.documentElement.classList.add('dark');
-    darkIcon.classList.add('hidden');
-    lightIcon.classList.remove('hidden');
-  } else {
-    document.documentElement.classList.remove('dark');
-    darkIcon.classList.remove('hidden');
-    lightIcon.classList.add('hidden');
+  console.log('DOM fully loaded');
+  
+  // Initialize DOM elements regardless of API availability
+  folderPathInput = document.getElementById('folder-path');
+  browseBtn = document.getElementById('browse-btn');
+  directoryTree = document.getElementById('directory-tree');
+  refreshTreeBtn = document.getElementById('refresh-tree-btn');
+  clearSelectionsBtn = document.getElementById('clear-selections-btn');
+  sortFilesCheckbox = document.getElementById('sort-files');
+  manualIgnoreTextarea = document.getElementById('manual-ignore');
+  sideTextTextarea = document.getElementById('side-text');
+  generateSnapshotBtn = document.getElementById('generate-snapshot-btn');
+  snapshotResult = document.getElementById('snapshot-result');
+  tokenCount = document.getElementById('token-count');
+  snapshotContent = document.getElementById('snapshot-content');
+  copySnapshotBtn = document.getElementById('copy-snapshot-btn');
+  themeToggle = document.getElementById('theme-toggle');
+  darkIcon = document.getElementById('dark-icon');
+  lightIcon = document.getElementById('light-icon');
+  sidebarResizeHandle = document.getElementById('sidebar-resize-handle');
+  sidebar = document.getElementById('sidebar');
+  
+  // Tab elements
+  snapshotTabBtn = document.getElementById('snapshot-tab-btn');
+  recreateTabBtn = document.getElementById('recreate-tab-btn');
+  snapshotTab = document.getElementById('snapshot-tab');
+  recreateTab = document.getElementById('recreate-tab');
+  
+  // Recreate tab elements
+  outputDirPathInput = document.getElementById('output-dir-path');
+  browseOutputBtn = document.getElementById('browse-output-btn');
+  snapshotInput = document.getElementById('snapshot-input');
+  recreateDirectoryBtn = document.getElementById('recreate-directory-btn');
+  recreateResult = document.getElementById('recreate-result');
+  
+  // Check if the API is available
+  if (!window.api) {
+    console.error('Error: window.api is not available. The preload script may not be loading correctly.');
+    directoryTree.innerHTML = `
+      <div class="p-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-md">
+        <h3 class="font-bold mb-2">Error: API Not Available</h3>
+        <p>The application could not initialize properly. Try one of the following:</p>
+        <ul class="list-disc pl-5 mt-2">
+          <li>Check the console for more details (Ctrl+Shift+I)</li>
+          <li>Restart the application</li>
+        </ul>
+      </div>
+    `;
+    // Still set up basic event listeners for UI functionality
+    setupEventListeners();
+    return;
   }
   
   // Set up event listeners
   setupEventListeners();
+  
+  // Initialize theme
+  const darkMode = localStorage.getItem('darkMode') === 'true';
+  if (darkMode) {
+    document.documentElement.classList.add('dark');
+    darkIcon.classList.remove('hidden');
+    lightIcon.classList.add('hidden');
+  }
 });
 
 // Set up all event listeners
@@ -64,28 +113,46 @@ function setupEventListeners() {
   // Theme toggle
   themeToggle.addEventListener('click', toggleTheme);
   
-  // Directory selection
-  browseBtn.addEventListener('click', browseDirectory);
-  folderPathInput.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
+  // Check if API is available before setting up API-dependent event listeners
+  if (window.api) {
+    // Directory selection
+    browseBtn.addEventListener('click', browseDirectory);
+    folderPathInput.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
+    
+    // Directory tree controls
+    refreshTreeBtn.addEventListener('click', () => loadDirectoryStructure(folderPathInput.value));
+    clearSelectionsBtn.addEventListener('click', clearSelections);
+    sortFilesCheckbox.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
+    
+    // Snapshot generation
+    generateSnapshotBtn.addEventListener('click', generateSnapshot);
+    copySnapshotBtn.addEventListener('click', copySnapshotToClipboard);
+    
+    // Recreate directory
+    browseOutputBtn.addEventListener('click', browseOutputDirectory);
+    recreateDirectoryBtn.addEventListener('click', recreateDirectory);
+  } else {
+    console.log('API not available, skipping API-dependent event listeners');
+    
+    // Add click handlers that show an error message
+    const apiErrorMessage = () => {
+      alert('API not available. The application is not functioning correctly.');
+    };
+    
+    browseBtn.addEventListener('click', apiErrorMessage);
+    refreshTreeBtn.addEventListener('click', apiErrorMessage);
+    clearSelectionsBtn.addEventListener('click', apiErrorMessage);
+    generateSnapshotBtn.addEventListener('click', apiErrorMessage);
+    copySnapshotBtn.addEventListener('click', apiErrorMessage);
+    browseOutputBtn.addEventListener('click', apiErrorMessage);
+    recreateDirectoryBtn.addEventListener('click', apiErrorMessage);
+  }
   
-  // Directory tree controls
-  refreshTreeBtn.addEventListener('click', () => loadDirectoryStructure(folderPathInput.value));
-  clearSelectionsBtn.addEventListener('click', clearSelections);
-  sortFilesCheckbox.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
-  
-  // Snapshot generation
-  generateSnapshotBtn.addEventListener('click', generateSnapshot);
-  copySnapshotBtn.addEventListener('click', copySnapshotToClipboard);
-  
-  // Tab switching
+  // Tab switching (doesn't require API)
   snapshotTabBtn.addEventListener('click', () => switchTab('snapshot'));
   recreateTabBtn.addEventListener('click', () => switchTab('recreate'));
   
-  // Recreate directory
-  browseOutputBtn.addEventListener('click', browseOutputDirectory);
-  recreateDirectoryBtn.addEventListener('click', recreateDirectory);
-  
-  // Sidebar resizing
+  // Sidebar resizing (doesn't require API)
   setupSidebarResize();
 }
 
@@ -120,10 +187,25 @@ function switchTab(tabName) {
 
 // Browse for a directory
 async function browseDirectory() {
-  const dirPath = await window.api.selectDirectory();
-  if (dirPath) {
-    folderPathInput.value = dirPath;
-    loadDirectoryStructure(dirPath);
+  try {
+    // Check if window.api exists
+    if (!window.api) {
+      console.error('Error: window.api is not available in browseDirectory function');
+      directoryTree.innerHTML = `<div class="text-red-500">Error: API not available. The preload script may not be loading correctly.</div>`;
+      return;
+    }
+    
+    console.log('Calling window.api.selectDirectory()');
+    const dirPath = await window.api.selectDirectory();
+    console.log('Selected directory:', dirPath);
+    
+    if (dirPath) {
+      folderPathInput.value = dirPath;
+      await loadDirectoryStructure(dirPath);
+    }
+  } catch (error) {
+    console.error('Error in browseDirectory:', error);
+    directoryTree.innerHTML = `<div class="text-red-500">Error: ${error.message || 'Unknown error'}</div>`;
   }
 }
 
@@ -137,19 +219,37 @@ async function browseOutputDirectory() {
 
 // Load the directory structure
 async function loadDirectoryStructure(dirPath) {
-  if (!dirPath) return;
+  if (!dirPath) {
+    console.log('No directory path provided to loadDirectoryStructure');
+    return;
+  }
+  
+  console.log(`Loading directory structure for: ${dirPath}`);
   
   try {
+    // Check if window.api exists
+    if (!window.api) {
+      console.error('Error: window.api is not available in loadDirectoryStructure function');
+      directoryTree.innerHTML = `<div class="text-red-500">Error: API not available. The preload script may not be loading correctly.</div>`;
+      return;
+    }
+    
+    console.log('Calling window.api.getDirectoryStructure()');
     const structure = await window.api.getDirectoryStructure(dirPath);
+    console.log('Received directory structure:', structure);
+    
     if (structure.error) {
+      console.error('Error in structure:', structure.error);
       directoryTree.innerHTML = `<div class="text-red-500">Error: ${structure.error}</div>`;
       return;
     }
     
     directoryStructure = structure;
+    console.log('Setting directoryStructure and rendering tree');
     renderDirectoryTree();
   } catch (error) {
-    directoryTree.innerHTML = `<div class="text-red-500">Error: ${error.message}</div>`;
+    console.error('Error in loadDirectoryStructure:', error);
+    directoryTree.innerHTML = `<div class="text-red-500">Error: ${error.message || 'Unknown error'}</div>`;
   }
 }
 
