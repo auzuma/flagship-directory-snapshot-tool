@@ -103,11 +103,29 @@ function generateSnapshot(rootPath, ignoreList = [], maxWorkers = 8) {
 function generateOutdir(dirname, snapshotContent) {
   return new Promise((resolve, reject) => {
     try {
+      // Validate input
+      if (!dirname || typeof dirname !== 'string') {
+        return reject('Invalid output directory path');
+      }
+      
+      if (!snapshotContent || typeof snapshotContent !== 'string') {
+        return reject('Invalid snapshot content');
+      }
+      
+      // Sanitize dirname to ensure it's a valid path
+      dirname = path.resolve(dirname);
+      
       // Create the output directory if it doesn't exist
       fs.mkdirSync(dirname, { recursive: true });
       
+      // Check if the content has the expected format
+      if (!snapshotContent.includes('---FILESTART:') || !snapshotContent.includes('---FILEEND---')) {
+        return reject('Invalid snapshot format. Snapshot must contain file markers (---FILESTART: and ---FILEEND---)');
+      }
+      
       // Split content by file markers
       const fileBlocks = snapshotContent.split('---FILESTART: ');
+      let filesCreated = 0;
       
       // Skip the first empty block
       for (let i = 1; i < fileBlocks.length; i++) {
@@ -118,22 +136,46 @@ function generateOutdir(dirname, snapshotContent) {
         if (parts.length < 2) continue;
         
         const filename = parts[0].trim();
+        
+        // Validate filename - must not contain code snippets or unusual characters
+        if (!filename || filename.includes('\n') || filename.includes('\\') || 
+            filename.includes('const ') || filename.includes('function ') || 
+            filename.includes(' = ') || filename.length > 256) {
+          console.warn(`Skipping invalid filename: ${filename}`);
+          continue;
+        }
+        
         let content = parts[1];
         
         // Extract content up to FILEEND marker
-        content = content.split('---FILEEND---')[0];
+        const endMarkerIndex = content.indexOf('---FILEEND---');
+        if (endMarkerIndex === -1) {
+          console.warn(`Skipping file ${filename} - missing end marker`);
+          continue;
+        }
         
-        const fullPath = path.join(dirname, filename);
-        const parentDir = path.dirname(fullPath);
+        content = content.substring(0, endMarkerIndex);
         
-        // Create parent directories if they don't exist
-        fs.mkdirSync(parentDir, { recursive: true });
-        
-        // Write the file
-        fs.writeFileSync(fullPath, content, 'utf-8');
+        try {
+          const fullPath = path.join(dirname, filename);
+          const parentDir = path.dirname(fullPath);
+          
+          // Create parent directories if they don't exist
+          fs.mkdirSync(parentDir, { recursive: true });
+          
+          // Write the file
+          fs.writeFileSync(fullPath, content, 'utf-8');
+          filesCreated++;
+        } catch (fileError) {
+          console.error(`Error creating file ${filename}: ${fileError.message}`);
+        }
       }
       
-      resolve(`Directory created successfully at ${dirname}`);
+      if (filesCreated === 0) {
+        return reject('No valid files found in the snapshot content');
+      }
+      
+      resolve(`Directory created successfully at ${dirname} with ${filesCreated} files`);
     } catch (error) {
       reject(`Failed to create directory: ${error.message}`);
     }

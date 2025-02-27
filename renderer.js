@@ -564,7 +564,7 @@ async function recreateDirectory() {
   } catch (error) {
     recreateResult.classList.remove('hidden');
     recreateResult.className = 'mt-4 p-4 rounded-md bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
-    recreateResult.textContent = `Error: ${error.message || 'Unknown error'}`;
+    recreateResult.textContent = `Error: ${typeof error === 'string' ? error : error.message || 'Unknown error'}`;
   } finally {
     recreateDirectoryBtn.disabled = false;
     recreateDirectoryBtn.textContent = 'Recreate Directory';

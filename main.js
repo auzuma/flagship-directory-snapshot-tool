@@ -114,7 +114,7 @@ ipcMain.handle('recreate-directory', async (event, { outputDir, snapshotContent 
     return { success: true, message: result };
   } catch (error) {
     console.error('Error recreating directory:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: typeof error === 'string' ? error : error.message || 'Unknown error' };
   }
 });
 
