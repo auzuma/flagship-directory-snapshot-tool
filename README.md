@@ -1,6 +1,6 @@
 # Flagship Directory Snapshot Tool - **The Ultimate Snapshot App, Built as an Electron Desktop Application**
 
-This is the Electron desktop version of the [Python Directory Snapshot Tool](https://github.com/gooddavvy/Py_markdown-directory-snapshot-special), providing the same functionality as the original Python-based tool but with a native desktop interface, and with a snapshot recreation tab.
+This is the Electron desktop version of the [Python Directory Snapshot Tool](https://github.com/gooddavvy/Py_markdown-directory-snapshot-special), providing the same functionality as the original Python-based tool but with a native desktop interface, and with **several enhancements and adjustments**.
 
 ## Features
 
