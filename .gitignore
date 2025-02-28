@@ -136,3 +136,6 @@ npm-debug.log
 yarn-error.log
 yarn-debug.log
 .DS_Store
+
+# output.md
+output.md

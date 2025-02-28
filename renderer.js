@@ -234,6 +234,14 @@ async function loadDirectoryStructure(dirPath) {
   
   console.log(`Loading directory structure for: ${dirPath}`);
   
+  // Show loading spinner
+  directoryTree.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">Loading directory structure...</p>
+    </div>
+  `;
+  
   try {
     // Check if window.api exists
     if (!window.api) {
@@ -254,7 +262,11 @@ async function loadDirectoryStructure(dirPath) {
     
     directoryStructure = structure;
     console.log('Setting directoryStructure and rendering tree');
-    renderDirectoryTree();
+    
+    // Add a delay before rendering the tree to show the loading spinner
+    setTimeout(() => {
+      renderDirectoryTree();
+    }, 800); // 800ms delay for better user experience
   } catch (error) {
     console.error('Error in loadDirectoryStructure:', error);
     directoryTree.innerHTML = `<div class="text-red-500">Error: ${error.message || 'Unknown error'}</div>`;
@@ -414,6 +426,14 @@ async function toggleDirectory(dirPath) {
 
 // Load directory children
 async function loadDirectoryChildren(dirPath, container, indentLevel) {
+  // Show loading spinner for the directory children
+  container.innerHTML = `
+    <div class="spinner-container py-2">
+      <div class="spinner" style="width: 24px; height: 24px; border-width: 3px;"></div>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+    </div>
+  `;
+  
   try {
     const children = await window.api.getDirectoryStructure(dirPath);
     
@@ -431,12 +451,15 @@ async function loadDirectoryChildren(dirPath, container, indentLevel) {
         })
       : children;
     
-    container.innerHTML = '';
-    
-    for (const child of sortedChildren) {
-      const childElement = createTreeItem(child, indentLevel);
-      container.appendChild(childElement);
-    }
+    // Add a small delay before rendering to show the loading spinner
+    setTimeout(() => {
+      container.innerHTML = '';
+      
+      for (const child of sortedChildren) {
+        const childElement = createTreeItem(child, indentLevel);
+        container.appendChild(childElement);
+      }
+    }, 400); // 400ms delay for better user experience
   } catch (error) {
     container.innerHTML = `<div class="text-red-500 ml-5">Error: ${error.message}</div>`;
   }
