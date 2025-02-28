@@ -74,7 +74,7 @@ html.cursor-ew-resize * {
 #sidebar {
   position: relative;
   transition: width 0.2s ease;
-  min-width: 200px;
+  min-width: 256px;
   max-width: 500px;
   border-right: 1px solid #e5e7eb;
 }

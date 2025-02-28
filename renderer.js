@@ -177,11 +177,15 @@ function switchTab(tabName) {
     recreateTab.classList.add('hidden');
     snapshotTabBtn.classList.add('active');
     recreateTabBtn.classList.remove('active');
+    // Show sidebar when in snapshot tab
+    sidebar.classList.remove('hidden');
   } else {
     snapshotTab.classList.add('hidden');
     recreateTab.classList.remove('hidden');
     snapshotTabBtn.classList.remove('active');
     recreateTabBtn.classList.add('active');
+    // Hide sidebar when in recreate tab
+    sidebar.classList.add('hidden');
   }
 }
 

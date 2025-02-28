@@ -24,10 +24,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
-  
-  // Enable DevTools for debugging
-  mainWindow.webContents.openDevTools();
-  
+
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
