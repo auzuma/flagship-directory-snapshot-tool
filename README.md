@@ -18,7 +18,7 @@ This is the Electron desktop version of the [Python Directory Snapshot Tool](htt
 
 - [Node.js](https://nodejs.org/) (v14 or later)
 - [npm](https://www.npmjs.com/) (usually comes with Node.js)
-- [python (Optional, only install if you run into issues with `node-gyp`)](https://www.python.org/downloads/) (only install if you run into issues with `node-gyp`, which requires python)
+- [python (Optional)](https://www.python.org/downloads/) (only install if you run into issues with `node-gyp`, which requires python)
 
 ### Setup
 
