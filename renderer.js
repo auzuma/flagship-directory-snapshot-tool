@@ -7,6 +7,7 @@ let browseBtn;
 let directoryTree;
 let refreshTreeBtn;
 let clearSelectionsBtn;
+let selectAllBtn;
 let sortFilesCheckbox;
 let manualIgnoreTextarea;
 let sideTextTextarea;
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   directoryTree = document.getElementById('directory-tree');
   refreshTreeBtn = document.getElementById('refresh-tree-btn');
   clearSelectionsBtn = document.getElementById('clear-selections-btn');
+  selectAllBtn = document.getElementById('select-all-btn');
   sortFilesCheckbox = document.getElementById('sort-files');
   manualIgnoreTextarea = document.getElementById('manual-ignore');
   sideTextTextarea = document.getElementById('side-text');
@@ -122,6 +124,7 @@ function setupEventListeners() {
     // Directory tree controls
     refreshTreeBtn.addEventListener('click', () => loadDirectoryStructure(folderPathInput.value));
     clearSelectionsBtn.addEventListener('click', clearSelections);
+    selectAllBtn.addEventListener('click', selectAll);
     sortFilesCheckbox.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
     
     // Snapshot generation
@@ -142,6 +145,7 @@ function setupEventListeners() {
     browseBtn.addEventListener('click', apiErrorMessage);
     refreshTreeBtn.addEventListener('click', apiErrorMessage);
     clearSelectionsBtn.addEventListener('click', apiErrorMessage);
+    selectAllBtn.addEventListener('click', apiErrorMessage);
     generateSnapshotBtn.addEventListener('click', apiErrorMessage);
     copySnapshotBtn.addEventListener('click', apiErrorMessage);
     browseOutputBtn.addEventListener('click', apiErrorMessage);
@@ -449,6 +453,30 @@ function clearSelections() {
       uncheckedItems.add(item.path);
     }
   });
+  
+  // Reload the tree
+  renderDirectoryTree();
+}
+
+// Select all items
+function selectAll() {
+  // Clear both sets first
+  checkedItems.clear();
+  uncheckedItems.clear();
+  
+  // Add all items to checkedItems, except default ignored items
+  const addAllItems = (items) => {
+    items.forEach(item => {
+      if (!item.isDefaultIgnored) {
+        checkedItems.add(item.path);
+      } else {
+        uncheckedItems.add(item.path);
+      }
+    });
+  };
+  
+  // Add all root items
+  addAllItems(directoryStructure);
   
   // Reload the tree
   renderDirectoryTree();
