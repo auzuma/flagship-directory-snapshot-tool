@@ -2,6 +2,8 @@
 
 This is the Electron desktop version of the [Python Directory Snapshot Tool](https://github.com/gooddavvy/Py_markdown-directory-snapshot-special), providing the same functionality as the original Python-based tool but with a native desktop interface, and with **several enhancements and adjustments**.
 
+![alt text](screenshot.png)
+
 ## Features
 
 - Create snapshots of directory structures and file contents
