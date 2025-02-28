@@ -72,7 +72,7 @@ This will create an .exe file.
 
 The application is built with:
 
-- Electron - for the desktop application framework
+- ElectronJS - for the desktop application framework
 - TailwindCSS - for styling
 - Pure JavaScript - for the frontend logic
 
@@ -81,10 +81,17 @@ The application is built with:
 - `main.js` - Main Electron process
 - `preload.js` - Preload script for secure IPC
 - `renderer.js` - Renderer process logic
+- `token-counter.js` - Token counter module using OpenAI's `tiktoken`
 - `index.html` - Main application UI
 - `styles/` - CSS files
 - `assets/` - Images and icons
 
+## Development and Contribution
+
+Please let us know (in the [Issues Section](https://github.com/auzuma/flagship-directory-snapshot-tool/issues/new)) if you encounter any issues during setup or usage.
+
+Also, we welcome direct contributions! Please open a pull request to the main branch, and we'd  love to review and merge your changes. Thank you ***so much*** for your support!
+
 ## License
 
-MIT
+This project is licensed under the Apache 2.0 License. See the `LICENSE` file for more information.
