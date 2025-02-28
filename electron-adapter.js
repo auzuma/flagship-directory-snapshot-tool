@@ -103,6 +103,8 @@ function generateSnapshot(rootPath, ignoreList = [], maxWorkers = 8) {
 function generateOutdir(dirname, snapshotContent) {
   return new Promise((resolve, reject) => {
     try {
+      console.log('Starting to generate output directory');
+      
       // Validate input
       if (!dirname || typeof dirname !== 'string') {
         return reject('Invalid output directory path');
@@ -112,6 +114,9 @@ function generateOutdir(dirname, snapshotContent) {
         return reject('Invalid snapshot content');
       }
       
+      console.log(`Output directory: ${dirname}`);
+      console.log(`Snapshot content length: ${snapshotContent.length} characters`);
+      
       // Sanitize dirname to ensure it's a valid path
       dirname = path.resolve(dirname);
       
@@ -120,44 +125,36 @@ function generateOutdir(dirname, snapshotContent) {
       
       // Check if the content has the expected format
       if (!snapshotContent.includes('---FILESTART:') || !snapshotContent.includes('---FILEEND---')) {
+        console.error('Snapshot format validation failed:');
+        console.error(`Contains FILESTART: ${snapshotContent.includes('---FILESTART:')}`);
+        console.error(`Contains FILEEND: ${snapshotContent.includes('---FILEEND---')}`);
         return reject('Invalid snapshot format. Snapshot must contain file markers (---FILESTART: and ---FILEEND---)');
       }
       
-      // Split content by file markers
-      const fileBlocks = snapshotContent.split('---FILESTART: ');
+      // Use regex to extract file blocks more reliably
+      const fileRegex = /---FILESTART:\s*([^-]+?)---\s*([\s\S]*?)---FILEEND---/g;
+      let match;
       let filesCreated = 0;
       
-      // Skip the first empty block
-      for (let i = 1; i < fileBlocks.length; i++) {
-        const block = fileBlocks[i];
+      // Process each file match
+      while ((match = fileRegex.exec(snapshotContent)) !== null) {
+        const filename = match[1].trim();
+        const content = match[2];
         
-        // Split into filename and content
-        const parts = block.split('---\n', 2);
-        if (parts.length < 2) continue;
-        
-        const filename = parts[0].trim();
+        console.log(`Processing file: ${filename}`);
         
         // Validate filename - must not contain code snippets or unusual characters
-        if (!filename || filename.includes('\n') || filename.includes('\\') || 
+        if (!filename || filename.includes('\n') || 
             filename.includes('const ') || filename.includes('function ') || 
             filename.includes(' = ') || filename.length > 256) {
           console.warn(`Skipping invalid filename: ${filename}`);
           continue;
         }
         
-        let content = parts[1];
-        
-        // Extract content up to FILEEND marker
-        const endMarkerIndex = content.indexOf('---FILEEND---');
-        if (endMarkerIndex === -1) {
-          console.warn(`Skipping file ${filename} - missing end marker`);
-          continue;
-        }
-        
-        content = content.substring(0, endMarkerIndex);
-        
         try {
-          const fullPath = path.join(dirname, filename);
+          // Normalize path separators for the current OS
+          const normalizedFilename = filename.replace(/\\/g, path.sep).replace(/\//g, path.sep);
+          const fullPath = path.join(dirname, normalizedFilename);
           const parentDir = path.dirname(fullPath);
           
           // Create parent directories if they don't exist
@@ -166,13 +163,16 @@ function generateOutdir(dirname, snapshotContent) {
           // Write the file
           fs.writeFileSync(fullPath, content, 'utf-8');
           filesCreated++;
+          console.log(`Created file: ${fullPath}`);
         } catch (fileError) {
           console.error(`Error creating file ${filename}: ${fileError.message}`);
         }
       }
       
       if (filesCreated === 0) {
-        return reject('No valid files found in the snapshot content');
+        console.error('Failed to create any files from snapshot content');
+        console.error('Check that your snapshot follows the format: ---FILESTART: path/to/file---[content]---FILEEND---');
+        return reject('No valid files found in the snapshot content. Please check the format of your snapshot.');
       }
       
       resolve(`Directory created successfully at ${dirname} with ${filesCreated} files`);
