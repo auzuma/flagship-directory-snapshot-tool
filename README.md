@@ -8,7 +8,7 @@ This is the Electron desktop version of the Directory Snapshot Tool, providing t
 - Recreate directory structures from snapshots
 - Customizable ignore patterns
 - Dark/light theme support
-- Token counting for AI model compatibility
+- Snapshot token counting for AI model compatibility
 - Expandable/collapsable folder structure
 - Adjustable sidebar width
 
@@ -45,7 +45,7 @@ To build the application for your platform:
 npm run build
 ```
 
-This will create distributable packages in the `dist` directory.
+This will create an .exe file.
 
 ## Usage
 
