@@ -320,9 +320,9 @@ function createTreeItem(item, indentLevel) {
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.className = 'mr-2';
-  checkbox.checked = !uncheckedItems.has(item.path) && !item.isDefaultIgnored;
+  checkbox.checked = checkedItems.has(item.path) || (!uncheckedItems.has(item.path) && !item.isDefaultIgnored);
   
-  if (item.isDefaultIgnored) {
+  if (item.isDefaultIgnored && !checkedItems.has(item.path)) {
     uncheckedItems.add(item.path);
   } else if (checkbox.checked) {
     checkedItems.add(item.path);
@@ -460,22 +460,26 @@ function clearSelections() {
 
 // Select all items
 function selectAll() {
-  // Clear both sets first
+  // Clear both sets
   checkedItems.clear();
   uncheckedItems.clear();
   
-  // Add all items to checkedItems, except default ignored items
+  // Recursively add all items to checkedItems
   const addAllItems = (items) => {
+    if (!items || !items.length) return;
+    
     items.forEach(item => {
-      if (!item.isDefaultIgnored) {
-        checkedItems.add(item.path);
-      } else {
-        uncheckedItems.add(item.path);
+      // Add this item
+      checkedItems.add(item.path);
+      
+      // If it has children, process them too
+      if (item.children) {
+        addAllItems(item.children);
       }
     });
   };
   
-  // Add all root items
+  // Add all items
   addAllItems(directoryStructure);
   
   // Reload the tree
