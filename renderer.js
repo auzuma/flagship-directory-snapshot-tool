@@ -123,7 +123,8 @@ function setupEventListeners() {
     
     // Directory tree controls
     refreshTreeBtn.addEventListener('click', () => loadDirectoryStructure(folderPathInput.value));
-    clearSelectionsBtn.addEventListener('click', clearSelections);
+    // Remove clearSelectionsBtn event listener as it's integrated into selectAll
+    // clearSelectionsBtn.addEventListener('click', clearSelections);
     selectAllBtn.addEventListener('click', selectAll);
     sortFilesCheckbox.addEventListener('change', () => loadDirectoryStructure(folderPathInput.value));
     
@@ -144,7 +145,8 @@ function setupEventListeners() {
     
     browseBtn.addEventListener('click', apiErrorMessage);
     refreshTreeBtn.addEventListener('click', apiErrorMessage);
-    clearSelectionsBtn.addEventListener('click', apiErrorMessage);
+    // Remove clearSelectionsBtn event listener as it's integrated into selectAll
+    // clearSelectionsBtn.addEventListener('click', apiErrorMessage);
     selectAllBtn.addEventListener('click', apiErrorMessage);
     generateSnapshotBtn.addEventListener('click', apiErrorMessage);
     copySnapshotBtn.addEventListener('click', apiErrorMessage);
@@ -295,6 +297,13 @@ function renderDirectoryTree() {
     const itemElement = createTreeItem(item, 0);
     directoryTree.appendChild(itemElement);
   }
+  
+  // Update Select All button text based on the current state
+  const allItemsCount = countAllItems(directoryStructure);
+  const isAllSelected = checkedItems.size === allItemsCount && uncheckedItems.size === 0;
+  
+  // Update the button text based on selection state
+  selectAllBtn.textContent = isAllSelected ? "✓ Unselect All" : "✓ Select All";
 }
 
 // Create a tree item element
@@ -483,30 +492,63 @@ function clearSelections() {
 
 // Select all items
 function selectAll() {
-  // Clear both sets
-  checkedItems.clear();
-  uncheckedItems.clear();
+  // Check if all items are already selected
+  const allItemsCount = countAllItems(directoryStructure);
+  const isAllSelected = checkedItems.size === allItemsCount && uncheckedItems.size === 0;
   
-  // Recursively add all items to checkedItems
-  const addAllItems = (items) => {
-    if (!items || !items.length) return;
+  if (isAllSelected) {
+    // If all items are selected, clear all selections
+    checkedItems.clear();
+    uncheckedItems.clear();
     
-    items.forEach(item => {
-      // Add this item
-      checkedItems.add(item.path);
+    // Update button text
+    selectAllBtn.textContent = "✓ Select All";
+  } else {
+    // Clear both sets
+    checkedItems.clear();
+    uncheckedItems.clear();
+    
+    // Recursively add all items to checkedItems
+    const addAllItems = (items) => {
+      if (!items || !items.length) return;
       
-      // If it has children, process them too
-      if (item.children) {
-        addAllItems(item.children);
-      }
-    });
-  };
-  
-  // Add all items
-  addAllItems(directoryStructure);
+      items.forEach(item => {
+        // Add this item
+        checkedItems.add(item.path);
+        
+        // If it has children, process them too
+        if (item.children) {
+          addAllItems(item.children);
+        }
+      });
+    };
+    
+    // Add all items
+    addAllItems(directoryStructure);
+    
+    // Update button text
+    selectAllBtn.textContent = "✓ Unselect All";
+  }
   
   // Reload the tree
   renderDirectoryTree();
+}
+
+// Count all items in the directory structure
+function countAllItems(items) {
+  if (!items || !items.length) return 0;
+  
+  let count = 0;
+  items.forEach(item => {
+    count++; // Count this item
+    
+    // If it has children, count them too
+    if (item.children) {
+      count += countAllItems(item.children);
+    }
+  });
+  
+  return count;
 }
 
 // Generate a snapshot
