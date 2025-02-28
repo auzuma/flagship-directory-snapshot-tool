@@ -607,8 +607,10 @@ async function generateSnapshot() {
       try {
         const count = window.api.countTokens(result.content);
         tokenCount.textContent = `The following snapshot contains ${count} AI natural language tokens`;
+        tokenCount.classList.add('blue-blockquote');
       } catch (error) {
         tokenCount.textContent = 'Token count unavailable';
+        tokenCount.classList.add('blue-blockquote');
         console.error('Error counting tokens:', error);
       }
       

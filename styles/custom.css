@@ -181,6 +181,22 @@ button:disabled {
   to { transform: rotate(360deg); }
 }
 
+/* Blue stylish blockquote for token count */
+.blue-blockquote {
+  background-color: #ebf5ff;
+  border-left: 4px solid #3b82f6;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin: 10px 0;
+  color: #1e40af;
+}
+
+.dark .blue-blockquote {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-left: 4px solid #2563eb;
+  color: #93c5fd;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
