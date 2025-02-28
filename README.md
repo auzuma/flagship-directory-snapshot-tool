@@ -1,6 +1,6 @@
-# Directory Snapshot Tool - Electron Desktop Application
+# Flagship Directory Snapshot Tool - **The Ultimate Snapshot App, Built as an Electron Desktop Application**
 
-This is the Electron desktop version of the Directory Snapshot Tool, providing the same functionality as the original Python-based tool but with a native desktop interface.
+This is the Electron desktop version of the [Python Directory Snapshot Tool](https://github.com/gooddavvy/Py_markdown-directory-snapshot-special), providing the same functionality as the original Python-based tool but with a native desktop interface, and with a snapshot recreation tab.
 
 ## Features
 
@@ -18,12 +18,13 @@ This is the Electron desktop version of the Directory Snapshot Tool, providing t
 
 - [Node.js](https://nodejs.org/) (v14 or later)
 - [npm](https://www.npmjs.com/) (usually comes with Node.js)
+- [Node.js](https://nodejs.org/) (v14 or later, in case NPM installation did not come with Node.js)
 
 ### Setup
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/directory-snapshot-tool
+   git clone https://github.com/auzuma/flagship-directory-snapshot-tool
    cd directory-snapshot-tool
    ```
 
