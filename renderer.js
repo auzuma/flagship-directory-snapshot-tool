@@ -499,7 +499,24 @@ function selectAll() {
   if (isAllSelected) {
     // If all items are selected, clear all selections
     checkedItems.clear();
-    uncheckedItems.clear();
+    
+    // Add all items to uncheckedItems to ensure they're all unchecked
+    const addAllToUnchecked = (items) => {
+      if (!items || !items.length) return;
+      
+      items.forEach(item => {
+        // Add this item to unchecked
+        uncheckedItems.add(item.path);
+        
+        // If it has children, process them too
+        if (item.children) {
+          addAllToUnchecked(item.children);
+        }
+      });
+    };
+    
+    // Add all items to unchecked
+    addAllToUnchecked(directoryStructure);
     
     // Update button text
     selectAllBtn.textContent = "✓ Select All";
